@@ -7,24 +7,24 @@ export interface Language {
 }
 
 //Available laguages for translation
-export const languages: Language[] = [
-    {code: 'en', name: 'English'},
-    {code: 'fr', name: 'French'},
-    {code: 'yo', name: 'Yoruba'},
-    {code: 'ig', name: 'Igbo'},
-    {code: 'es', name: 'Spanish'},
-    {code: 'du', name: 'Dutch'},
-    {code: 'it', name: 'Italian'},
-    {code: 'ja', name: 'Japanese'},
-    {code: 'ko', name: 'Korean'},
-    {code: 'pt', name: 'Portuguese'},
-    {code: 'ha', name: 'Hausa'},
-    {code: 'ar', name: 'Arabic'},
-    {code: 'zh', name: 'Chinese'},
+export const LANGUAGES: Language[] = [
+    {code: 'en-US', name: 'English'},
+    {code: 'fr-FR', name: 'French'},
+    //{code: 'yo', name: 'Yoruba'}, Web Speech API does not support Yoruba
+    //{code: 'ig', name: 'Igbo'}, 
+    {code: 'es-ES', name: 'Spanish'},
+    {code: 'nl-NL', name: 'Dutch'},
+    {code: 'it-IT', name: 'Italian'},
+    {code: 'ja-JP', name: 'Japanese'},
+    {code: 'ko-KR', name: 'Korean'},
+    {code: 'pt-PT', name: 'Portuguese'},
+    //{code: 'ha', name: 'Hausa'}, 
+    {code: 'ar-SA', name: 'Arabic'},
+    {code: 'zh-CN', name: 'Chinese'},
 ];
 
 //Transcription status
-export type TranscriptionStatus = 'idle'| 'recording' | 'completed' | 'error';
+export type TranscriptionStatus = 'idle'| 'recording' | 'processing' | 'completed' | 'error';
 
 //Translation status
 export type TranslationStatus = 'idle' | 'translating' | 'completed' | 'error';
