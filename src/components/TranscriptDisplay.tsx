@@ -35,7 +35,7 @@ const highlightMedicalTerms = (text: string, terms: string[]): string => {
   const sortedTerms = [...terms].sort((a, b) => b.length - a.length);
 
   for (const term of sortedTerms) {
-    // Use regex with escaped term to avoid regex special characters issues
+    // Use regex
     const escapedTerm = escapeRegExp(term);
     const regex = new RegExp(`\\b(${escapedTerm})\\b`, 'gi');
     highlightedText = highlightedText.replace(
