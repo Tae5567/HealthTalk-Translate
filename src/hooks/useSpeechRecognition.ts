@@ -20,6 +20,7 @@ interface useSpeechRecognitionResult {
     stopListening: () => void;
     resetTranscript: () => void;
     supported: boolean;
+    medicalTerms: string[];
 }
 
 interface SpeechRecognitionEventType extends Event {
@@ -71,7 +72,8 @@ export default function useSpeechRecognition({
     const [error, setError] = useState<string | null>(null); 
     const recognitionRef = useRef<SpeechRecognitionType | null>(null);
     const supported = typeof SpeechRecognitionAPI !== 'undefined';
-    
+    const [medicalTerms, setMedicalTerms] = useState<string[]>([]);
+
     // Add a shouldRestartRef to track if we want to restart recognition
     const shouldRestartRef = useRef<boolean>(false);
 
@@ -84,9 +86,11 @@ export default function useSpeechRecognition({
         if (!improveMedical|| !text.trim()) return;
         try {
             console.log("Improving medical terms:", text);
-            const improvedText = await improveMedicalTerms(text);
+            const { text: improvedText, medicalTerms } = await improveMedicalTerms(text);
             console.log("Improved text:", improvedText);
+            console.log("Medical terms:", medicalTerms);
             setTranscript(improvedText);
+            setMedicalTerms(medicalTerms);
         } catch (error) {
             console.error("Error improving transcript", error);
             //Set the original transcript if there is an error
@@ -319,6 +323,7 @@ export default function useSpeechRecognition({
         startListening,
         stopListening,
         resetTranscript,
-        supported
+        supported,
+        medicalTerms
     };
 }

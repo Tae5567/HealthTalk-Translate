@@ -7,12 +7,14 @@ interface SpeechRecognitionProps {
   language: string;
   onTranscriptChange: (transcript: string) => void;
   onStatusChange: (status: TranscriptionStatus) => void;
+  onMedicalTermsChange?: (terms: string[]) => void;
 }
 
 export default function SpeechRecognition({
     language,
     onTranscriptChange,
     onStatusChange,
+    onMedicalTermsChange
   }: SpeechRecognitionProps) {
     const {
       transcript,
@@ -22,7 +24,8 @@ export default function SpeechRecognition({
       startListening,
       stopListening,
       resetTranscript,
-      supported
+      supported,
+      medicalTerms
     } = useSpeechRecognition({
       language,
       continuous: true,
@@ -30,6 +33,13 @@ export default function SpeechRecognition({
       improveMedical: true,
     });
   
+    //Update medical terms when they change
+    useEffect(() => {
+      if (onMedicalTermsChange) {
+        onMedicalTermsChange(medicalTerms);
+      }
+    }, [medicalTerms, onMedicalTermsChange]);
+
     // Update the transcript when it changes
     useEffect(() => {
       console.log("Transcript changed:", transcript);

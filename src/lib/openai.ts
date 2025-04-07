@@ -10,18 +10,18 @@ if (!apiKey) {
 
 //Create and export the OpenAI client
 export const openai = new OpenAI({
-    apiKey: apiKey || 'dummy-key-replace-with-real-one', // Provide dummy key to avoid initialization errors
+    apiKey: apiKey || 'dummy-key-replace-with-real-one', // Use dummy key to avoid initialization errors
     dangerouslyAllowBrowser: true
 });
 
 //Helper function for improving/enhancing medical terms
-export async function improveMedicalTerms(text: string): Promise<string> {
-    if (!text.trim()) return text;
+export async function improveMedicalTerms(text: string): Promise<{text: string, medicalTerms: string[]}> {
+    if (!text.trim()) return {text, medicalTerms: []};
     
     // Check if API key is available first
     if (!apiKey) {
         console.error("No OpenAI API key provided - cannot improve medical terms");
-        return text;
+        return {text, medicalTerms: []};
     }
     
     try {
@@ -31,7 +31,7 @@ export async function improveMedicalTerms(text: string): Promise<string> {
             messages: [
                 {
                     role: "system",
-                    content: "You are a helpful medical transcription assistant. Correct any medical terminology in the following text while preserving the original meaning. Only make changes to medical terms that were likely misheard or misspelled."
+                    content: "You are a helpful medical transcription assistant. Correct any medical terminology in the following text while preserving the original meaning. Return the corrected text and also provide a JSON array of all medical terms identified, like this format: {\"text\": \"corrected text\", \"medicalTerms\": [\"term1\", \"term2\"]}"
                 },
                 {
                     role: "user",
@@ -42,12 +42,25 @@ export async function improveMedicalTerms(text: string): Promise<string> {
             max_tokens: 1000
         });
 
-        const result = response.choices[0].message.content || text;
-        console.log("OpenAI response for medical term improvement:", result);
-        return result;
+        const responseText = response.choices[0].message.content || "{}";
+        console.log("Raw response:", responseText);
+
+        try {
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            const jsonStr = jsonMatch ? jsonMatch[0] : responseText;
+            
+            const parsedResponse = JSON.parse(jsonStr);
+            return {
+                text: parsedResponse.text || text,
+                medicalTerms: Array.isArray(parsedResponse.medicalTerms) ? parsedResponse.medicalTerms : []
+            };
+        } catch (parseError) {
+            console.error("Error parsing JSON response", parseError);
+            return {text, medicalTerms: []};
+        }
     } catch (error) {
         console.error("Error improving medical terms transcription", error);
-        return text;
+        return {text, medicalTerms: []};
     }
 }
 

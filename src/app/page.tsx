@@ -26,6 +26,8 @@ export default function Home() {
 
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
+  const [medicalTerms, setMedicalTerms] = useState<string[]>([]);
+
   useEffect(() => {
     const hasAccepted = localStorage.getItem("privacyNoticeAccepted") === "true";
     setPrivacyAccepted(hasAccepted);
@@ -158,7 +160,6 @@ export default function Home() {
       )}
        <>
     {!privacyAccepted && <PrivacyNotice onAccept={() => setPrivacyAccepted(true)} />}
-    {/* Existing Page Code */}
   </>
       
       <div className="mb-6">
@@ -216,12 +217,14 @@ export default function Home() {
             transcript={transcript}
             status={transcriptionStatus}
             placeholder="Speak to start transcription..."
+            medicalTerms={medicalTerms}
           />
           <div className="mt-4">
             <SpeechRecognition
               language={sourceLanguage}
               onTranscriptChange={setTranscript}
               onStatusChange={setTranscriptionStatus}
+              onMedicalTermsChange={setMedicalTerms}
             />
           </div>
         </div>

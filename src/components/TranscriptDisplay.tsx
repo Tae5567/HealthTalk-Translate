@@ -5,26 +5,61 @@ interface TranscriptDisplayProps {
   transcript: string;
   status: TranscriptionStatus | TranslationStatus; // Accept either type transcription or translation
   placeholder?: string;
+  medicalTerms?: string[];
 }
 
 export default function TranscriptDisplay({
   transcript,
   status,
   placeholder = 'Transcript will appear here...',
+  medicalTerms = [],
 }: TranscriptDisplayProps) {
     
   // Determine if the status is recording, processing or an error
   const isRecording = status === 'recording';
   const isProcessing = status === 'processing' || status === 'translating';
   const isError = status === 'error';
+  
+ // Helper function to escape special regex characters
+ const escapeRegExp = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
+// Highlight medical terms in the transcript
+const highlightMedicalTerms = (text: string, terms: string[]): string => {
+  if (!terms.length) return text;
+
+  let highlightedText = text;
+
+  // Sort terms by length in descending order
+  const sortedTerms = [...terms].sort((a, b) => b.length - a.length);
+
+  for (const term of sortedTerms) {
+    // Use regex with escaped term to avoid regex special characters issues
+    const escapedTerm = escapeRegExp(term);
+    const regex = new RegExp(`\\b(${escapedTerm})\\b`, 'gi');
+    highlightedText = highlightedText.replace(
+      regex,
+      '<span class="bg-[#ffecb3] text-[#d67a00] px-1 rounded">$1</span>'
+    );
+  }
+  return highlightedText;
+};
+
+  //Function to display the transcript with highlighted medical terms
+  const displayTerms = transcript? (medicalTerms.length ? (
+    <p className="whitespace-pre-wrap text-gray-700"
+      dangerouslySetInnerHTML={{ __html: highlightMedicalTerms(transcript, medicalTerms) }}></p>
+  ) : (
+    <p className="whitespace-pre-wrap text-gray-700">{transcript}</p>
+  )) : (
+    <p className="text-gray-400 italic">{placeholder}</p>
+  );
+
 
   return (
     <div className="min-h-[240px] border border-[#f0e0e0] rounded-lg p-4 bg-[#fefeff] relative shadow-inner">
-      {transcript ? (
-        <p className="whitespace-pre-wrap text-gray-700">{transcript}</p>
-      ) : (
-        <p className="text-gray-400 italic">{placeholder}</p>
-      )}
+      {displayTerms}
       
       {/* Status indicators */}
       {isRecording && (
